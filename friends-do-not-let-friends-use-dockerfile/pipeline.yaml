@@ -1,0 +1,26 @@
+---
+resources:
+  - name: repo
+    type: git
+    source:
+      uri: ((app-url))
+      branch: ((app-branch))
+      private_key: ((github-private-key))
+
+  - name: hello-world-docker-image
+    type: docker-image
+    source:
+      email: ((docker-hub-email))
+      username: ((docker-hub-username))
+      password: ((docker-hub-password))
+      repository: ((docker-hub-username))/concourse-tutorial-hello-world
+
+jobs:
+  - name: dockerfile
+    public: true
+    serial: true
+    plan:
+      - get: tutorial
+      - put: hello-world-docker-image
+        params:
+          build: tutorial/tutorials/miscellaneous/docker-images/docker
