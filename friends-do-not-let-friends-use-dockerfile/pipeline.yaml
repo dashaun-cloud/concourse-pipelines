@@ -1,26 +1,28 @@
 ---
 resources:
-  - name: repo
+  - name: git-repo
     type: git
     source:
+      tag_filter: v*
       uri: ((app-url))
-      branch: ((app-branch))
+      branch: main
       private_key: ((github-private-key))
 
-  - name: hello-world-docker-image
+  - name: docker-image
     type: docker-image
     source:
-      email: ((docker-hub-email))
       username: ((docker-hub-username))
       password: ((docker-hub-password))
-      repository: ((docker-hub-username))/concourse-tutorial-hello-world
+      repository: ((docker-hub-username))/((docker-image-name))
 
 jobs:
   - name: dockerfile
     public: true
     serial: true
     plan:
-      - get: tutorial
-      - put: hello-world-docker-image
+      - get: version
+      - get: git-repo
+        trigger: true
+      - put: docker-image
         params:
-          build: tutorial/tutorials/miscellaneous/docker-images/docker
+          build: git-repo

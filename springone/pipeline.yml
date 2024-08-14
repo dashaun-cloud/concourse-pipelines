@@ -1,0 +1,123 @@
+---
+resources:
+- name: repo
+  type: git
+  source:
+    uri: https://github.com/dashaun-demo/spring-pet-clinic
+    branch: main
+    username: dashaun
+    password: ((github-token))
+
+jobs:
+- name: unit-test
+  serial: true
+  public: true
+  plan:
+  - get: repo
+    trigger: true
+  - task: mvnw-clean-package
+    privileged: true
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: bellsoft/liberica-openjdk-debian
+          tag: 17
+      inputs:
+        - name: repo
+      run:
+        path: sh
+        args:
+          - -c
+          - |
+            cd repo
+            ./mvnw -q clean package
+- name: build-image
+  serial: true
+  public: true
+  plan:
+  - get: repo
+    passed: [unit-test]
+    trigger: true
+#  - task: spring-boot-build-image
+#    privileged: true
+#    config:
+#      platform: linux
+#      image_resource:
+#        type: docker-image
+#        source:
+#          repository: amidos/dcind
+#      inputs:
+#        - name: repo
+#      run:
+#        path: bash
+#        args:
+#          - -exc
+#          - |
+#            source /docker-lib.sh
+#            start_docker
+#            docker ps
+#            echo "docker started !!!!!!"
+#            apk add zip unzip
+#            curl -s "https://get.sdkman.io" | bash
+#            source "/root/.sdkman/bin/sdkman-init.sh"
+#            cd repo
+#            sdk install java 17.0.12-librca
+#            sdk use java 17.0.12-librca
+#            ./mvnw -q spring-boot:build-image
+
+
+  - task: spring-boot-build-image-tcc
+    privileged: true
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: dashaun/task-runner
+          tag: 0.0.1
+      inputs:
+        - name: repo
+      run:
+        path: bash
+        args:
+          - -exc
+          - |
+            export TC_CLOUD_TOKEN=((tcc-token))
+            cd repo
+            sdk install java 17.0.12-librca
+            sdk use java 17.0.12-librca
+            docker context use tcc
+            export DOCKER_CONTEXT=tcc
+            echo $DOCKER_HOST
+            ./mvnw -q spring-boot:build-image -DskipTests \
+            -Ddocker.publishRegistry.username=((docker-user)) \
+            -Ddocker.publishRegistry.password=((docker-pass)) \
+            -Dspring-boot.build-image.publish=false \
+            -Dspring-boot.build-image.imageName=dashaun/spring-pet-clinic
+
+#  - task: spring-boot-build-image
+#    privileged: true
+#    config:
+#      platform: linux
+#      image_resource:
+#        type: docker-image
+#        source:
+#          repository: dashaun/concourse-dind
+#      inputs:
+#        - name: repo
+#      run:
+#        path: bash
+#        args:
+#          - -c
+#          - |
+#            docker ps
+#            apt update
+#            apt install -y zip unzip
+#            curl -s "https://get.sdkman.io" | bash
+#            source "/root/.sdkman/bin/sdkman-init.sh"
+#            cd repo
+#            sdk install java 17.0.12-librca
+#            sdk use java 17.0.12-librca
+#            ./mvnw -q spring-boot:build-image
