@@ -1,0 +1,98 @@
+---
+resources:
+- name: repo
+  type: git
+  source:
+    uri: https://github.com/dashaun-demo/spring-petclinic
+    branch: main
+    username: dashaun
+    password: ((github-token))
+
+jobs:
+- name: advisor-build-config
+  serial: true
+  public: true
+  plan:
+  - get: repo
+    trigger: true
+  - task: advisor-build-config
+    privileged: true
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: dashaun/task-runner
+          tag: latest
+      inputs:
+        - name: repo
+      run:
+        path: /bin/bash
+        args:
+          - -exc
+          - |
+            source "/root/.sdkman/bin/sdkman-init.sh"
+            cd repo
+            sdk install java 17.0.12-librca
+            sdk use java 17.0.12-librca
+            advisor build-config get
+- name: advisor-get-upgrade-plan
+  serial: true
+  public: true
+  plan:
+  - get: repo
+    passed: [advisor-build-config]
+    trigger: true
+  - task: advisor-get-upgrade-plan
+    privileged: true
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: dashaun/task-runner
+          tag: latest
+      inputs:
+        - name: repo
+      run:
+        path: /bin/bash
+        args:
+          - -exc
+          - |
+            export ADVISOR_SERVER=http://100.101.0.61:8090
+            source "/root/.sdkman/bin/sdkman-init.sh"
+            cd repo
+            sdk install java 17.0.12-librca
+            sdk use java 17.0.12-librca
+            advisor build-config get
+- name: create-branch-with-changes
+  serial: true
+  public: true
+  plan:
+    - get: repo
+      passed: [advisor-get-upgrade-plan]
+      trigger: true
+    - task: create-branch-with-changes
+      privileged: true
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: dashaun/task-runner
+            tag: latest
+        inputs:
+          - name: repo
+        run:
+          path: /bin/bash
+          args:
+            - -exc
+            - |
+              export GIT_TOKEN_FOR_PRS=((github-token))
+              export ADVISOR_SERVER=http://100.101.0.61:8090
+              source "/root/.sdkman/bin/sdkman-init.sh"
+#              cd repo
+#              sdk install java 17.0.12-librca
+#              sdk use java 17.0.12-librca
+#              advisor build-config get
+#              advisor upgrade-plan get

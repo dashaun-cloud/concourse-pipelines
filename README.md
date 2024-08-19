@@ -23,6 +23,12 @@ fly -t kaiju set-team --team-name dashaun-demo --github-org=dashaun-demo --githu
 fly -t kaiju set-team --team-name javagrunt-com -c team-config/javagrunt-com.yaml
 ```
 
+### Advisor Server
+
+```bash
+./gradlew :application-advisor-server:bootRun --args='--server.port=8090 --debug'
+```
+
 
 ### Tanzu Laptop
 
