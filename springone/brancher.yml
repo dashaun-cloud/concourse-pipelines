@@ -34,6 +34,8 @@ jobs:
             type: docker-image
             source:
               repository: dashaun/task-runner
+              username: ((dockerhub-user))
+              password: ((dockerhub-token))
               tag: latest
           inputs:
             - name: feature-branches
@@ -51,4 +53,6 @@ jobs:
         set_pipeline: ((.:branch.name))
         file: concourse-pipelines/springone/branch.yml
         vars: {branch: ((.:branch.name)),
-               github-token: ((github-token))}
+               github-token: ((github-token)),
+               dockerhub-user: ((dockerhub-user)),
+               dockerhub-token: ((dockerhub-token))}

@@ -23,6 +23,8 @@ jobs:
         type: docker-image
         source:
           repository: dashaun/task-runner
+          username: ((dockerhub-user))
+          password: ((dockerhub-token))
           tag: latest
       inputs:
         - name: repo
@@ -32,13 +34,6 @@ jobs:
           - -exc
           - |
             set +x
-            curl -L --silent --user ((spring-enterprise-user)):((spring-enterprise-token)) https://packages.broadcom.com/artifactory/spring-enterprise/com/vmware/tanzu/spring/application-advisor-cli-linux/1.0.0/application-advisor-cli-linux-1.0.0.tar --output advisor.tar
-            tar -xf advisor.tar
-            install ./cli-binary/advisor /usr/local/bin/advisor
-            mkdir -p /root/.m2
-            tee /root/.m2/settings.xml &>/dev/null <<EOF
-            ((maven-config))
-            EOF
             export GIT_TOKEN_FOR_PRS=((github-token))
             export ADVISOR_SERVER=http://100.101.0.61:8080
             source "/root/.sdkman/bin/sdkman-init.sh"
@@ -50,4 +45,3 @@ jobs:
             advisor build-config get
             advisor upgrade-plan get
             advisor upgrade-plan apply --push
-            cat .advisor/errors/*.log
