@@ -23,6 +23,8 @@ jobs:
         type: docker-image
         source:
           repository: dashaun/task-runner
+          username: ((dockerhub-user))
+          password: ((dockerhub-token))
           tag: latest
       inputs:
         - name: repo
@@ -53,6 +55,8 @@ jobs:
         type: docker-image
         source:
           repository: dashaun/task-runner
+          username: ((dockerhub-user))
+          password: ((dockerhub-token))
           tag: latest
       inputs:
         - name: repo
@@ -77,6 +81,8 @@ jobs:
           type: docker-image
           source:
             repository: dashaun/task-runner
+            username: ((dockerhub-user))
+            password: ((dockerhub-token))
             tag: latest
         inputs:
           - name: repo
@@ -101,6 +107,8 @@ jobs:
           type: docker-image
           source:
             repository: dashaun/task-runner
+            username: ((dockerhub-user))
+            password: ((dockerhub-token))
             tag: latest
         inputs:
           - name: repo
@@ -125,6 +133,8 @@ jobs:
           type: docker-image
           source:
             repository: dashaun/task-runner
+            username: ((dockerhub-user))
+            password: ((dockerhub-token))
             tag: latest
         inputs:
           - name: repo
@@ -149,6 +159,8 @@ jobs:
           type: docker-image
           source:
             repository: dashaun/task-runner
+            username: ((dockerhub-user))
+            password: ((dockerhub-token))
             tag: latest
         inputs:
           - name: repo
@@ -173,6 +185,8 @@ jobs:
           type: docker-image
           source:
             repository: dashaun/task-runner
+            username: ((dockerhub-user))
+            password: ((dockerhub-token))
             tag: latest
         inputs:
           - name: repo
@@ -197,6 +211,8 @@ jobs:
           type: docker-image
           source:
             repository: dashaun/task-runner
+            username: ((dockerhub-user))
+            password: ((dockerhub-token))
             tag: latest
         inputs:
           - name: repo
