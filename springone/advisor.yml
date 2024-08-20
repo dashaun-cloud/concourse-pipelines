@@ -9,13 +9,13 @@ resources:
     password: ((github-token))
 
 jobs:
-- name: advisor-build-config
+- name: spring-application-advisor
   serial: true
   public: true
   plan:
   - get: repo
     trigger: true
-  - task: advisor-build-config
+  - task: spring-application-advisor
     privileged: true
     config:
       platform: linux
@@ -31,68 +31,23 @@ jobs:
         args:
           - -exc
           - |
+            set +x
+            curl -L --silent --user ((spring-enterprise-user)):((spring-enterprise-token)) https://packages.broadcom.com/artifactory/spring-enterprise/com/vmware/tanzu/spring/application-advisor-cli-linux/1.0.0/application-advisor-cli-linux-1.0.0.tar --output advisor.tar
+            tar -xf advisor.tar
+            install ./cli-binary/advisor /usr/local/bin/advisor
+            mkdir -p /root/.m2
+            tee /root/.m2/settings.xml &>/dev/null <<EOF
+            ((maven-config))
+            EOF
+            export GIT_TOKEN_FOR_PRS=((github-token))
+            export ADVISOR_SERVER=http://100.101.0.61:8080
             source "/root/.sdkman/bin/sdkman-init.sh"
             cd repo
             sdk install java 17.0.12-librca
-            sdk use java 17.0.12-librca
+            sdk install java 21.0.2-graalce
+            sdk use java 21.0.2-graalce
+            set -x
             advisor build-config get
-- name: advisor-get-upgrade-plan
-  serial: true
-  public: true
-  plan:
-  - get: repo
-    passed: [advisor-build-config]
-    trigger: true
-  - task: advisor-get-upgrade-plan
-    privileged: true
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: dashaun/task-runner
-          tag: latest
-      inputs:
-        - name: repo
-      run:
-        path: /bin/bash
-        args:
-          - -exc
-          - |
-            export ADVISOR_SERVER=http://100.101.0.61:8090
-            source "/root/.sdkman/bin/sdkman-init.sh"
-            cd repo
-            sdk install java 17.0.12-librca
-            sdk use java 17.0.12-librca
-            advisor build-config get
-- name: create-branch-with-changes
-  serial: true
-  public: true
-  plan:
-    - get: repo
-      passed: [advisor-get-upgrade-plan]
-      trigger: true
-    - task: create-branch-with-changes
-      privileged: true
-      config:
-        platform: linux
-        image_resource:
-          type: docker-image
-          source:
-            repository: dashaun/task-runner
-            tag: latest
-        inputs:
-          - name: repo
-        run:
-          path: /bin/bash
-          args:
-            - -exc
-            - |
-              export GIT_TOKEN_FOR_PRS=((github-token))
-              export ADVISOR_SERVER=http://100.101.0.61:8090
-              source "/root/.sdkman/bin/sdkman-init.sh"
-#              cd repo
-#              sdk install java 17.0.12-librca
-#              sdk use java 17.0.12-librca
-#              advisor build-config get
-#              advisor upgrade-plan get
+            advisor upgrade-plan get
+            advisor upgrade-plan apply --push
+            cat .advisor/errors/*.log

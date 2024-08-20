@@ -4,7 +4,7 @@ resources:
   type: git
   source:
     uri: https://github.com/dashaun-demo/spring-petclinic
-    branch: main
+    branch: ((branch))
     username: dashaun
     password: ((github-token))
 
