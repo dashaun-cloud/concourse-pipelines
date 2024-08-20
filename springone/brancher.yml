@@ -48,6 +48,7 @@ jobs:
       - across:
           - var: branch
             values: ((.:branches))
-        set_pipeline: dev
+        set_pipeline: ((.:branch.name))
         file: concourse-pipelines/springone/branch.yml
-        vars: {branch: ((.:branch.name))}
+        vars: {branch: ((.:branch.name)),
+               github-token: ((github-token))}

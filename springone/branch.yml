@@ -31,14 +31,12 @@ jobs:
         args:
           - -exc
           - |
+            set +x
             source "/root/.sdkman/bin/sdkman-init.sh"
-            whoami
-            env
-            pwd
-            export TC_CLOUD_TOKEN=((tcc-token))
             cd repo
             sdk install java 17.0.12-librca
             sdk use java 17.0.12-librca
+            set -x
             ./mvnw -q clean package
 - name: integration-test
   serial: true
