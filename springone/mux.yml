@@ -55,4 +55,5 @@ jobs:
         vars: {branch: ((.:branch.name)),
                github-token: ((github-token)),
                dockerhub-user: ((dockerhub-user)),
-               dockerhub-token: ((dockerhub-token))}
+               dockerhub-token: ((dockerhub-token)),
+               github-key: ((github-key))}
