@@ -53,4 +53,5 @@ jobs:
             advisor -version
             advisor build-config get
             advisor upgrade-plan get
-            advisor upgrade-plan apply --push
+            advisor upgrade-plan apply
+            git status
