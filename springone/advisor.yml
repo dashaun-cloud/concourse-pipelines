@@ -21,6 +21,8 @@ jobs:
   serial: true
   public: true
   plan:
+  - get: every-3hours
+    trigger: true
   - get: repo
     trigger: true
   - task: spring-application-advisor
