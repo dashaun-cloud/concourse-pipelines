@@ -3,10 +3,12 @@ resources:
 - name: repo
   type: git
   source:
-    uri: https://github.com/dashaun-demo/spring-petclinic
+    uri: git@github.com:dashaun-demo/spring-petclinic.git
+    private_key: |
+      ((github-key))
+
     branch: main
-    username: dashaun
-    password: ((github-token))
+    skip_ssl_verification: true
 
 jobs:
 - name: spring-application-advisor

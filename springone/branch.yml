@@ -41,23 +41,6 @@ jobs:
             sdk use java 17.0.12-librca
             set -x
             ./mvnw -q clean package
-  - task: spring-boot-build-image
-    privileged: true
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: dashaun/task-runner
-          tag: latest
-      inputs:
-        - name: repo
-      run:
-        path: /bin/bash
-        args:
-          - -exc
-          - |
-            sleep 10
 - name: integration-test
   serial: true
   public: true
