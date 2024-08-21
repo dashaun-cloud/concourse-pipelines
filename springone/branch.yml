@@ -65,7 +65,7 @@ jobs:
         args:
           - -exc
           - |
-            whoami
+            sleep 10
 - name: smoke-test
   serial: true
   public: true
@@ -91,7 +91,7 @@ jobs:
           args:
             - -exc
             - |
-              whoami
+              sleep 10
 - name: e2e-test
   serial: true
   public: true
@@ -117,7 +117,7 @@ jobs:
           args:
             - -exc
             - |
-              whoami
+              sleep 10
 - name: cleanup
   serial: true
   public: true
@@ -143,4 +143,4 @@ jobs:
           args:
             - -exc
             - |
-              whoami
+              sleep 10
