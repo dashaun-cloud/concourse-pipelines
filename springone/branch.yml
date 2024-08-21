@@ -36,7 +36,6 @@ jobs:
             set +x
             source "/root/.sdkman/bin/sdkman-init.sh"
             cd repo
-            sdk install java 17.0.12-librca
             sdk use java 17.0.12-librca
             set -x
             ./mvnw -q clean package

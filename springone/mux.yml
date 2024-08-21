@@ -26,25 +26,6 @@ jobs:
           - get: branches
             trigger: true
           - get: pipelines
-      - task: show-branches
-        privileged: true
-        config:
-          platform: linux
-          image_resource:
-            type: docker-image
-            source:
-              repository: dashaun/task-runner
-              username: ((dockerhub-user))
-              password: ((dockerhub-token))
-              tag: latest
-          inputs:
-            - name: branches
-          run:
-            path: /bin/bash
-            args:
-              - -exc
-              - |
-                cat branches/branches.json
       - load_var: branches
         file: branches/branches.json
       - across:
