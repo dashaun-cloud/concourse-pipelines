@@ -15,7 +15,7 @@ resources:
 
   - name: pipelines
     type: git
-    icon: github
+    icon: pipe
     source:
       uri: git@github.com:dashaun-cloud/concourse-pipelines
       private_key: |
