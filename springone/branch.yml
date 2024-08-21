@@ -41,7 +41,7 @@ jobs:
             cd repo
             sdk use java 17.0.12-librca
             set -x
-            ./mvnw -q clean package
+            ./mvnw -q clean test
 - name: integration-test
   serial: true
   public: true
