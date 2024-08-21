@@ -6,6 +6,7 @@ resources:
     uri: git@github.com:dashaun-demo/spring-petclinic.git
     private_key: |
       ((github-key))
+
     branch: ((branch))
     skip_ssl_verification: true
 
