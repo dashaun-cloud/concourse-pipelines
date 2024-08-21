@@ -7,6 +7,7 @@ resource_types:
 resources:
   - name: branches
     type: git-branches
+    icon: github
     source:
       uri: git@github.com:dashaun-demo/spring-petclinic.git
       private_key: |
@@ -14,6 +15,7 @@ resources:
 
   - name: pipelines
     type: git
+    icon: github
     source:
       uri: git@github.com:dashaun-cloud/concourse-pipelines
       private_key: |

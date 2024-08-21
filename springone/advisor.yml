@@ -1,7 +1,13 @@
 ---
 resources:
+- name: every-3hours
+  type: time
+  icon: clock-outline
+  source:
+    interval: 3h
 - name: repo
   type: git
+  icon: github
   source:
     uri: git@github.com:dashaun-demo/spring-petclinic.git
     private_key: |
@@ -45,4 +51,4 @@ jobs:
             advisor -version
             advisor build-config get
             advisor upgrade-plan get
-            advisor upgrade-plan apply --debug --push
+            advisor upgrade-plan apply --push

@@ -2,6 +2,7 @@
 resources:
 - name: repo
   type: git
+  icon: github
   source:
     uri: git@github.com:dashaun-demo/spring-petclinic.git
     private_key: |
