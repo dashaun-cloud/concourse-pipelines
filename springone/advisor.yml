@@ -13,9 +13,7 @@ resources:
     private_key: |
       ((github-key))
 
-    branch: main
     fetch_tags: true
-    skip_ssl_verification: true
 
 jobs:
 - name: spring-application-advisor
@@ -51,8 +49,8 @@ jobs:
             cd repo
             sdk use java 21.0.2-graalce
             set -x
+            git checkout main
             advisor -version
             advisor build-config get
             advisor upgrade-plan get
-            advisor upgrade-plan apply
             advisor upgrade-plan apply --push
