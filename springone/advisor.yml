@@ -1,6 +1,6 @@
 ---
 resources:
-- name: every-3hours
+- name: every-3-hours
   type: time
   icon: clock-outline
   source:
@@ -21,7 +21,7 @@ jobs:
   serial: true
   public: true
   plan:
-  - get: every-3hours
+  - get: every-3-hours
     trigger: true
   - get: repo
     trigger: true
