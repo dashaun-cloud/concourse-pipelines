@@ -42,6 +42,8 @@ jobs:
             sdk install java 21.0.2-graalce
             sdk use java 21.0.2-graalce
             set -x
+            advisor -version
             advisor build-config get
+            cat target/.advisor/build-config.json | grep "dashaun-demo"
             advisor upgrade-plan get
-            advisor upgrade-plan apply --push
+            advisor upgrade-plan apply --debug --push

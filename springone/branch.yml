@@ -3,10 +3,10 @@ resources:
 - name: repo
   type: git
   source:
-    uri: https://github.com/dashaun-demo/spring-petclinic
+    uri: git@github.com:dashaun-demo/spring-petclinic.git
+    private_key: |
+      ((github-key))
     branch: ((branch))
-    username: dashaun
-    password: ((github-token))
 
 jobs:
 - name: unit-test

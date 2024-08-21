@@ -5,27 +5,27 @@ resource_types:
       repository: aoldershaw/git-branches-resource
 
 resources:
-  - name: feature-branches
+  - name: branches
     type: git-branches
     source:
-      uri: https://github.com/dashaun-demo/spring-petclinic
-      username: dashaun
-      password: ((github-token))
+      uri: git@github.com:dashaun-demo/spring-petclinic.git
+      private_key: |
+        ((github-key))
 
-  - name: concourse-pipelines
+  - name: pipelines
     type: git
     source:
-      uri: https://github.com/dashaun-cloud/concourse-pipelines
-      username: dashaun
-      password: ((github-token))
+      uri: git@github.com:dashaun-cloud/concourse-pipelines
+      private_key: |
+        ((github-key))
 
 jobs:
   - name: set-feature-pipelines
     plan:
       - in_parallel:
-          - get: feature-branches
+          - get: branches
             trigger: true
-          - get: concourse-pipelines
+          - get: pipelines
       - task: show-branches
         privileged: true
         config:
@@ -38,20 +38,20 @@ jobs:
               password: ((dockerhub-token))
               tag: latest
           inputs:
-            - name: feature-branches
+            - name: branches
           run:
             path: /bin/bash
             args:
               - -exc
               - |
-                cat feature-branches/branches.json
+                cat branches/branches.json
       - load_var: branches
-        file: feature-branches/branches.json
+        file: branches/branches.json
       - across:
           - var: branch
             values: ((.:branches))
         set_pipeline: ((.:branch.name))
-        file: concourse-pipelines/springone/branch.yml
+        file: pipelines/springone/branch.yml
         vars: {branch: ((.:branch.name)),
                github-token: ((github-token)),
                dockerhub-user: ((dockerhub-user)),
