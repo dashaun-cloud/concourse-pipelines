@@ -11,7 +11,7 @@ resources:
     skip_ssl_verification: true
 
 jobs:
-- name: unit-test
+- name: build-image
   serial: true
   public: true
   plan:
@@ -63,7 +63,7 @@ jobs:
   public: true
   plan:
   - get: repo
-    passed: [unit-test]
+    passed: [build-image]
     trigger: true
   - task: integration-test
     privileged: true
