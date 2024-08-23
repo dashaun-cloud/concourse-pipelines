@@ -9,6 +9,7 @@ resources:
       ((github-key))
 
     branch: ((branch))
+    fetch_tags: true
     skip_ssl_verification: true
 
 jobs:
