@@ -6,6 +6,12 @@ resource_types:
     repository: aoldershaw/git-branches-resource
 
 resources:
+- name: every-3-hours
+  type: time
+  icon: clock-outline
+  source:
+    interval: 3h
+
 - name: branches
   type: git-branches
   icon: github
@@ -13,6 +19,7 @@ resources:
     uri: git@github.com:dashaun-demo/spring-petclinic.git
     private_key: |
       ((github-key))
+
 - name: pipelines
   type: git
   icon: pipe
@@ -20,11 +27,7 @@ resources:
     uri: git@github.com:dashaun-cloud/concourse-pipelines
     private_key: |
       ((github-key))
-- name: every-3-hours
-  type: time
-  icon: clock-outline
-  source:
-    interval: 3h
+
 - name: repo
   type: git
   icon: github
