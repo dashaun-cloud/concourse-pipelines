@@ -30,7 +30,6 @@ resources:
   icon: github
   source:
     uri: git@github.com:dashaun-demo/spring-petclinic.git
-    fetch_tags: true
     private_key: |
       ((github-key))
 
