@@ -25,6 +25,9 @@ resources:
   icon: pipe
   source:
     uri: git@github.com:dashaun-cloud/concourse-pipelines
+    git_config:
+    - name: safe.directory
+      value: '*'
     private_key: |
       ((github-key))
 
@@ -33,6 +36,9 @@ resources:
   icon: github
   source:
     uri: git@github.com:dashaun-demo/spring-petclinic.git
+    git_config:
+    - name: safe.directory
+      value: '*'
     private_key: |
       ((github-key))
 
