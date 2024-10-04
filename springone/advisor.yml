@@ -126,7 +126,7 @@ jobs:
           - |
             set +x
             export GIT_TOKEN_FOR_PRS=((github-token))
-            export ADVISOR_SERVER=http://100.101.0.61:8080
+            export ADVISOR_SERVER=http://saa.apps-127-0-0-1.nip.io
             source "/root/.sdkman/bin/sdkman-init.sh"
             cd repo
             sdk use java 21.0.2-graalce
