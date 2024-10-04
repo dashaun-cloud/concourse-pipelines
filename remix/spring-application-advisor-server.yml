@@ -1,0 +1,43 @@
+---
+resource_types:
+  - name: apache-directory-index
+    type: docker-image
+    icon: file-tree
+    source:
+      repository: mastertinner/apache-directory-index-resource
+
+resources:
+  - name: advisor-server
+    type: apache-directory-index
+    source:
+      directory: https://packages.broadcom.com/artifactory/spring-enterprise/com/vmware/tanzu/spring/application-advisor-server/
+      folder_pattern: $VERSION
+      file_pattern: $VERSION/application-advisor-server-$VERSION.jar
+      expand: false
+
+jobs:
+  - name: spring-application-advisor
+    serial: true
+    public: true
+    plan:
+      - get: advisor-server
+        trigger: true
+      - task: mvnw-clean-package
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: dashaun/task-runner
+              username: ((dockerhub-user))
+              password: ((dockerhub-token))
+              tag: latest
+          inputs:
+            - name: advisor-server
+          run:
+            path: /bin/bash
+            args:
+              - -exc
+              - |
+                ls -latr
