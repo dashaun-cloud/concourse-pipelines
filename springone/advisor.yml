@@ -2,7 +2,6 @@
 resource_types:
 - name: apache-directory-index
   type: docker-image
-  icon: file-tree
   source:
     repository: mastertinner/apache-directory-index-resource
 
@@ -14,6 +13,7 @@ resource_types:
 resources:
 - name: advisor-server
   type: apache-directory-index
+  icon: file-tree
   source:
     directory: https://packages.broadcom.com/artifactory/spring-enterprise/com/vmware/tanzu/spring/application-advisor-server/
     folder_pattern: $VERSION
