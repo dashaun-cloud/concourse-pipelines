@@ -1,9 +1,10 @@
 ---
 resource_types:
-- name: apache-directory-index
-  type: docker-image
+- name: maven-resource
+  type: registry-image
   source:
-    repository: mastertinner/apache-directory-index-resource
+    repository: nulldriver/maven-resource
+    tag: latest
 
 - name: git-branches
   type: registry-image
@@ -12,13 +13,12 @@ resource_types:
 
 resources:
 - name: advisor-server
-  type: apache-directory-index
-  icon: file-tree
+  type: maven-resource
   source:
-    directory: https://packages.broadcom.com/artifactory/spring-enterprise/com/vmware/tanzu/spring/application-advisor-server/
-    folder_pattern: $VERSION
-    file_pattern: $VERSION/application-advisor-server-$VERSION.jar
-    expand: false
+    url: https://packages.broadcom.com/artifactory/spring-enterprise/com/vmware/tanzu/spring/application-advisor-server/
+    artifact: com.vmware.tanzu.spring:application-advisor-server:jar
+    username: ((saa-user))
+    password: ((saa-pass))
 
 - name: every-3-hours
   type: time
