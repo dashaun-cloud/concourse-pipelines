@@ -15,7 +15,7 @@ resources:
 - name: advisor-server
   type: maven-resource
   source:
-    url: https://packages.broadcom.com/artifactory/spring-enterprise/
+    url: https://packages.broadcom.com/artifactory/spring-enterprise
     artifact: com.vmware.tanzu.spring:application-advisor-server:jar
     username: ((saa-user))
     password: ((saa-pass))
