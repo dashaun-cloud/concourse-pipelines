@@ -4,10 +4,12 @@ resources:
   type: git
   icon: github
   source:
+    git_config:
+      - name: safe.directory
+        value: '*'
     uri: git@github.com:dashaun-demo/spring-petclinic.git
     private_key: |
       ((github-key))
-
     branch: ((branch))
     fetch_tags: true
     skip_ssl_verification: true
