@@ -1,4 +1,4 @@
 roles:
-  - name: owner
-    github:
-      teams: ["org:javagrunt-com"]
+- name: owner
+  github:
+    teams: ["org:javagrunt-com"]

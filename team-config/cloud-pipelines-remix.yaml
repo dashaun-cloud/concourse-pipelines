@@ -1,4 +1,4 @@
 roles:
-  - name: owner
-    github:
-      teams: ["org:cloud-pipelines-remix"]
+- name: owner
+  github:
+    teams: ["org:cloud-pipelines-remix"]

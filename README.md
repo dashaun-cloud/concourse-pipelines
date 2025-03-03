@@ -4,23 +4,23 @@ Centralized CI
 ### Login to Concourse
 
 ```bash
-fly login -c https://concourse.dashaun.live -t live
+fly login -c https://concourse.dashaun.cloud -t live
 ```
 
 ```bash
-fly -t kaiju set-pipeline -p hello-world -c sample-pipelines/hello-world.yaml
+fly -t live set-pipeline -p hello-world -c sample-pipelines/hello-world.yaml
 ```
 
 ### Create Team
 
 ```bash
-fly -t kaiju set-team --team-name javagrunt-com --github-org=javagrunt-com --github-user=pinkemma --github-user=colabottles
+fly -t live set-team --team-name javagrunt-com --github-org=javagrunt-com --github-user=pinkemma --github-user=colabottles
 
-fly -t kaiju set-team --team-name dashaun-demo --github-org=dashaun-demo --github-user=pinkemma --github-user=colabottles --github-user=thiagochirana
+fly -t live set-team --team-name dashaun-demo --github-org=dashaun-demo --github-user=pinkemma --github-user=colabottles --github-user=thiagochirana
 ```
 
 ```bash
-fly -t kaiju set-team --team-name javagrunt-com -c team-config/javagrunt-com.yaml
+fly -t live set-team --team-name javagrunt-com -c team-config/javagrunt-com.yaml
 ```
 
 ### Advisor Server

@@ -1,4 +1,4 @@
 roles:
-- name: viewer
+- name: member
   github:
     users: ["eunix56"]
