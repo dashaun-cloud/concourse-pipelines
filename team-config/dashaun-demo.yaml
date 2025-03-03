@@ -2,6 +2,6 @@ roles:
   - name: owner
     github:
       teams: ["org:dashaun-demo"]
-  - name: member
+  - name: viewer
     github:
       users: ["pinkemma","colabottles","thiagochirana"]

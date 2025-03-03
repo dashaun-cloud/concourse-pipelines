@@ -1,0 +1,62 @@
+---
+resource_types:
+  - name: maven-resource
+    type: registry-image
+    source:
+      repository: nulldriver/maven-resource
+      tag: latest
+resources:
+  - name: repo
+    type: git
+    icon: github
+    source:
+      uri: ((uri))
+      branch: main
+
+jobs:
+  - name: simple
+    serial: true
+    public: true
+    plan:
+      - get: repo
+        trigger: true
+        params: { depth: 1 }
+      - task: maven-stuff
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ubuntu
+          inputs:
+            - name: repo
+          caches:
+            - path: repo/.m2
+            - path: /root/.sdkman
+          run:
+            path: sh
+            args:
+              - -c
+              - |
+                set +x
+                apt-get update -q > /dev/null
+                apt-get upgrade -y > /dev/null
+                apt-get install curl zip unzip bash -y > /dev/null
+                echo ""
+                echo ""
+                echo "Install SDKman"
+                curl -s "https://get.sdkman.io" | bash
+                bash -c '
+                source "/root/.sdkman/bin/sdkman-init.sh"
+                cd repo 
+                echo "Initialize env"
+                echo ""
+                sdk env install
+                echo "Run the unit tests"
+                ./mvnw clean test
+                echo ""
+                export DOCKER_HOST=tcp://100.98.42.132:2375
+                ./mvnw spring-boot:build-image
+                '
+        

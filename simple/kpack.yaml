@@ -1,0 +1,57 @@
+---
+resource_types:
+  - name: maven-resource
+    type: registry-image
+    source:
+      repository: nulldriver/maven-resource
+      tag: latest
+resources:
+  - name: repo
+    type: git
+    icon: github
+    source:
+      uri: ((uri))
+      branch: main
+
+jobs:
+  - name: kpack
+    serial: true
+    public: true
+    plan:
+      - get: repo
+        trigger: true
+        params: { depth: 1 }
+      - task: apply-kpack-image
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: bitnami/kubectl
+              tag: latest
+          inputs:
+            - name: repo
+          run:
+            path: /bin/bash
+            args:
+              - -c
+              - |
+                echo "((kube_config))" > /.kube/config
+                kubectl get nodes -o wide
+                kubectl apply -f - <<EOF
+                apiVersion: kpack.io/v1alpha1
+                kind: Image
+                metadata:
+                  name: ianmongs-org-vaadin-demo
+                  namespace: default
+                spec:
+                  tag: dashaun/your-image:latest
+                  serviceAccount: kpack-service-account
+                  builder:
+                    name: my-builder
+                    kind: Builder
+                  source:
+                    git:
+                      url: ((uri))
+                      revision: main
+                EOF

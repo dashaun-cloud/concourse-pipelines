@@ -1,0 +1,4 @@
+roles:
+- name: member
+  github:
+    users: ["dancan254"]
