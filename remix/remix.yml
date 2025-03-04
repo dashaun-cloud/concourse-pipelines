@@ -40,60 +40,13 @@ jobs:
                 apt-get upgrade -y > /dev/null
                 apt-get install curl -y > /dev/null
                 
-                echo "curl"
                 curl https://concourse.dashaun.cloud/api/v1/cli?arch=amd64&platform=linux > /usr/local/bin/fly
-                echo "done"
+                chmod +x /usr/local/bin/fly
+                fly -h
                 
-                # Loop through all team config files
                 for team_file in repo/team-config/*.yml; do
                   team_name=$(basename "$team_file" .yml)
                   echo "Processing team: $team_name"
-                
-                  # Check if team exists
-                  if fly -t local teams | grep -q "^$team_name "; then
-                    echo "Team $team_name exists, will update"
-                    # Create script to update team
-                    cat > "processed-configs/$team_name.sh" << EOF
-                    #!/bin/bash
-                    set -e
-                    echo "Updating team $team_name"
-                    fly -t local set-team --team-name=$team_name --config=$team_file --non-interactive
-                    EOF
-                  else
-                    echo "Team $team_name doesn't exist, will create"
-                    # Create script to create team
-                    cat > "processed-configs/$team_name.sh" << EOF
-                    #!/bin/bash
-                    set -e
-                    echo "Creating team $team_name"
-                    fly -t local set-team --team-name=$team_name --config=$team_file --non-interactive
-                    EOF
-                  fi
-                
-                  # Make scripts executable
-                  chmod +x "processed-configs/$team_name.sh"
+                  echo "Team file: $team_file"
+                  fly -t local set-team --team-name=$team_name --config=$team_file --non-interactive
                 done
-                
-                # Create a summary script that will run all team scripts
-                cat > processed-configs/update-all-teams.sh << EOF
-                #!/bin/bash
-                set -e
-                echo "Starting team updates"
-                
-                # First, authenticate with Concourse
-                echo "Logging in to Concourse"
-                fly -t local login -c \$CONCOURSE_URL -u \$CONCOURSE_USERNAME -p \$CONCOURSE_PASSWORD -n \$CONCOURSE_TEAM
-                
-                # Run all team scripts
-                for script in *.sh; do
-                  if [ "\$script" != "update-all-teams.sh" ]; then
-                    echo "Running \$script"
-                    ./\$script
-                  fi
-                done
-                
-                echo "All teams updated successfully"
-                EOF
-                
-                chmod +x processed-configs/update-all-teams.sh
-                echo "Processing complete"
