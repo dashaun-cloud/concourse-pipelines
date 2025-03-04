@@ -1,7 +1,4 @@
 roles:
 - name: owner
   github:
-    teams: ["org:dashaun-demo"]
-- name: viewer
-  github:
-    users: ["pinkemma","colabottles","thiagochirana"]
+    teams: ["org:dashaun-com"]
