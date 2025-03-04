@@ -1,4 +1,15 @@
 ---
+# Pipeline variables:
+# - orgname: Organization name for image tagging
+# - repositoryname: Repository name for image tagging
+# - uri: Git repository URL
+# - git_branch: Git branch to build
+# - git_username: Git credentials (if needed)
+# - git_password: Git credentials (if needed)
+# - docker_registry: Container registry URL
+# - registry_username: Registry credentials
+# - registry_password: Registry credentials
+
 resource_types:
   - name: maven-resource
     type: registry-image
@@ -11,17 +22,17 @@ resources:
     icon: github
     source:
       uri: ((uri))
-      branch: main
+      tag_filter: "v*"
 
 jobs:
-  - name: simple
+  - name: unit-tests
     serial: true
     public: true
     plan:
       - get: repo
         trigger: true
         params: { depth: 1 }
-      - task: maven-stuff
+      - task: run-unit-tests
         privileged: true
         config:
           platform: linux
@@ -33,9 +44,8 @@ jobs:
             - name: repo
           caches:
             - path: repo/.m2
-            - path: /root/.sdkman
           run:
-            path: sh
+            path: bash
             args:
               - -c
               - |
@@ -43,20 +53,108 @@ jobs:
                 apt-get update -q > /dev/null
                 apt-get upgrade -y > /dev/null
                 apt-get install curl zip unzip bash -y > /dev/null
-                echo ""
-                echo ""
-                echo "Install SDKman"
                 curl -s "https://get.sdkman.io" | bash
-                bash -c '
                 source "/root/.sdkman/bin/sdkman-init.sh"
                 cd repo 
-                echo "Initialize env"
-                echo ""
                 sdk env install
-                echo "Run the unit tests"
-                ./mvnw clean test
-                echo ""
+                # Check for wrapper scripts
+                if [ -f "mvnw" ]; then
+                  chmod +x ./mvnw
+                  ./mvnw clean test
+                elif [ -f "gradlew" ]; then
+                  chmod +x ./gradlew
+                  ./gradlew test
+                else
+                  echo "Error: Neither mvnw nor gradlew found in the repository"
+                  exit 1
+                fi
+  - name: integration-tests
+    serial: true
+    public: true
+    plan:
+      - get: repo
+        passed: [ unit-tests ]
+        trigger: true
+        params: { depth: 1 }
+      - task: run-integration-tests
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ubuntu
+          inputs:
+            - name: repo
+          caches:
+            - path: repo/.m2
+          run:
+            path: bash
+            args:
+              - -c
+              - |
+                set +x
+                apt-get update -q > /dev/null
+                apt-get upgrade -y > /dev/null
+                apt-get install curl zip unzip bash -y > /dev/null
+                curl -s "https://get.sdkman.io" | bash
+                source "/root/.sdkman/bin/sdkman-init.sh"
+                cd repo 
+                sdk env install
+                # Check for wrapper scripts
+                if [ -f "mvnw" ]; then
+                  chmod +x ./mvnw
+                  ./mvnw clean verify -DskipUnitTests
+                elif [ -f "gradlew" ]; then
+                  chmod +x ./gradlew
+                  ./gradlew integrationTest
+                else
+                  echo "Error: Neither mvnw nor gradlew found in the repository"
+                  exit 1
+                fi               
+
+  - name: oci-image
+    serial: true
+    public: true
+    plan:
+      - get: repo
+        passed: [ integration-tests ]
+        trigger: true
+        params: { depth: 1 }
+      - task: jvm-amd64-oci
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ubuntu
+          inputs:
+            - name: repo
+          caches:
+            - path: repo/.m2
+          run:
+            path: bash
+            args:
+              - -c
+              - |
+                set +x
+                apt-get update -q > /dev/null
+                apt-get upgrade -y > /dev/null
+                apt-get install curl zip unzip bash -y > /dev/null
+                curl -s "https://get.sdkman.io" | bash
+                source "/root/.sdkman/bin/sdkman-init.sh"
+                cd repo 
+                sdk env install
                 export DOCKER_HOST=tcp://100.98.42.132:2375
-                ./mvnw spring-boot:build-image
-                '
-        
+                # Check for wrapper scripts
+                if [ -f "mvnw" ]; then
+                  chmod +x ./mvnw
+                  ./mvnw spring-boot:build-image
+                elif [ -f "gradlew" ]; then
+                  chmod +x ./gradlew
+                  ./gradlew bootBuildImage
+                else
+                  echo "Error: Neither mvnw nor gradlew found in the repository"
+                  exit 1
+                fi

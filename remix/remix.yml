@@ -5,3 +5,95 @@ resource_types:
     source:
       repository: quay.io/coralogix/concourse-resource-github-list-repos
       tag: v0.5.0
+resources:
+  - name: repo
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/dashaun-cloud/concourse-pipelines
+
+jobs:
+  - name: teams
+    serial: true
+    public: true
+    plan:
+      - get: repo
+        trigger: true
+        params: { depth: 1 }
+      - task: process-team-configs
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ubuntu
+          inputs:
+            - name: repo
+          run:
+            path: /bin/bash
+            args:
+              - -c
+              - |
+                set -e
+                
+                apt-get update -q > /dev/null
+                apt-get upgrade -y > /dev/null
+                apt-get install curl -y > /dev/null
+                
+                echo "curl"
+                curl https://concourse.dashaun.cloud/api/v1/cli?arch=amd64&platform=linux > /usr/local/bin/fly
+                echo "done"
+                
+                # Loop through all team config files
+                for team_file in repo/team-config/*.yml; do
+                  team_name=$(basename "$team_file" .yml)
+                  echo "Processing team: $team_name"
+                
+                  # Check if team exists
+                  if fly -t local teams | grep -q "^$team_name "; then
+                    echo "Team $team_name exists, will update"
+                    # Create script to update team
+                    cat > "processed-configs/$team_name.sh" << EOF
+                    #!/bin/bash
+                    set -e
+                    echo "Updating team $team_name"
+                    fly -t local set-team --team-name=$team_name --config=$team_file --non-interactive
+                    EOF
+                  else
+                    echo "Team $team_name doesn't exist, will create"
+                    # Create script to create team
+                    cat > "processed-configs/$team_name.sh" << EOF
+                    #!/bin/bash
+                    set -e
+                    echo "Creating team $team_name"
+                    fly -t local set-team --team-name=$team_name --config=$team_file --non-interactive
+                    EOF
+                  fi
+                
+                  # Make scripts executable
+                  chmod +x "processed-configs/$team_name.sh"
+                done
+                
+                # Create a summary script that will run all team scripts
+                cat > processed-configs/update-all-teams.sh << EOF
+                #!/bin/bash
+                set -e
+                echo "Starting team updates"
+                
+                # First, authenticate with Concourse
+                echo "Logging in to Concourse"
+                fly -t local login -c \$CONCOURSE_URL -u \$CONCOURSE_USERNAME -p \$CONCOURSE_PASSWORD -n \$CONCOURSE_TEAM
+                
+                # Run all team scripts
+                for script in *.sh; do
+                  if [ "\$script" != "update-all-teams.sh" ]; then
+                    echo "Running \$script"
+                    ./\$script
+                  fi
+                done
+                
+                echo "All teams updated successfully"
+                EOF
+                
+                chmod +x processed-configs/update-all-teams.sh
+                echo "Processing complete"
